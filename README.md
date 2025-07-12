@@ -7,3 +7,4 @@ Este repositorio contiene recursos de la aplicación de metodos estadisticos usa
 contactos: 
 - darianacortez@gmail.com
 - anyelina140306@gmail.com
+- mariafelixyataco@gmail.com
