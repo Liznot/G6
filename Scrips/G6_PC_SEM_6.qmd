@@ -1,0 +1,221 @@
+---
+title: "Actividad PC2"
+format: html
+---
+
+GRUPO 06
+
+Choquecahua Bendezú Carol Neyduth\
+Clemente Valenzuela Brithney Coraima\
+Cortez Carbonell Dariana Ysabel\
+Felix Yataco Maria Fernanda\
+Huaripuma Lozano Anyelina Yuli\
+Larico Mamani Liz Heydi Patricia
+
+# Instalar y Cargar paquetes para el cálculo de análisis de poder estadístico
+
+```{r}
+install.packages("epiR")
+```
+
+```{r}
+library(epiR)
+```
+
+# 1. Cálculo de muestra para un estudio de prevalencia (survey)
+
+Para el cálculo de muestra de un estudio de prevalencia es necesaria la información sobre la prevalencia esperada (`Py`) y, opcionalmente, el tamaño de la población.
+
+**CASO1:** Un grupo de investigadores desea determinar la frecuencia de fracaso en el tratamiento de tuberculosis en pacientes con antecedentes de tratamiento en un hospital de Lima. Un estudio previo, realizado en 605 pacientes, ha determinado que la proporción de pacientes que no tuvieron éxito en el tratamiento fue del 40% (correspondiente a los pacientes que reingresaron por recaída).([DOI: https://doi.org/10.7705/biomedica.6961](https://doi.org/10.7705/biomedica.6961))
+
+¿Cuál sería el tamaño de muestra necesario?
+
+Aquí, usamos la función `episssimpleestb()`: Sample size to estimate a binary outcome using simple random sampling
+
+```{r}
+epi.sssimpleestb(N = NA, Py = 0.40 ,
+                 epsilon = 0.20, error = "relative", 
+                 se = 1, sp = 1, 
+                 nfractional = FALSE, conf.level = 0.95)
+```
+
+Producirá un tamaño de muestra de aproximadamente 145 pacientes para estimar la frecuencia de fracaso en el tratamiento de tuberculosis en pacientes con antecedentes de tratamiento en un hospital de Lima, con un error relativo del 20% y un nivel de confianza del 95%.
+
+**CASO2:** Un grupo de investigadores desea determinar la prevalencia de diabetes mellitus tipo 2 en adultos en el departamento de Cajamarca. Un estudio previo, realizado a nivel nacional entre 2005 y 2018, ha determinado que la prevalencia de diabetes en Cajamarca alcanzó un incremento del 1733,3%, con una prevalencia final de 22,1 casos por cada 100 000 habitantes en 2018 . ([DOI:http://doi.org/10.5867/medwave.2019.10.7723](http://doi.org/10.5867/medwave.2019.10.7723)).
+
+¿Cuál sería el tamaño de muestra necesario?
+
+Aquí, usamos la función `episssimpleestb()`: Sample size to estimate a binary outcome using simple random sampling
+
+```{r}
+epi.sssimpleestb(N = NA, Py = 0.000221, 
+                 epsilon = 0.20, error = "relative", 
+                 se = 1, sp = 1, 
+                 nfractional = FALSE, conf.level = 0.95)
+```
+
+Producirá un tamaño de muestra de aproximadamente 434459 adultos para estimar la prevalencia de diabetes mellitus tipo 2 en Cajamarca con un error relativo del 20% y un nivel de confianza del 95%. corresponde al rango de tiempo de 2005 a 2018.
+
+**Caso 3:**Un grupo de investigadores desea determinar la proporción de pacientes con asma grave no controlados que logren un buen control con omalizumab en un hospital de Lima. Un estudio previo, que incluyó 1118 pacientes en nueve estudios observacionales, ha determinado que la efectividad agregada estimada del omalizumab en el buen control de asma grave fue del 80,6% ([DOI: https://doi.org/10.29262/ram.v67i1.701](https://doi.org/10.29262/ram.v67i1.701))
+
+¿Cuál sería el tamaño de muestra necesario?
+
+Aquí, usamos la función `episssimpleestb()`: Sample size to estimate a binary outcome using simple random sampling
+
+```{r}
+epi.sssimpleestb(N = NA, Py = 0.806, 
+                 epsilon = 0.20, error = "relative", 
+                 se = 1, sp = 1, 
+                 nfractional = FALSE, conf.level = 0.95)
+```
+
+Producirá un tamaño de muestra de aproximadamente 24 pacientes para estimar la proporción de pacientes con asma grave no controlados que logran un buen control con omalizumab en un hospital de Lima, con un error relativo del 20% y un nivel de confianza del 95%.
+
+# 2.Cálculo de muestra para un estudio de casos y controles
+
+**CASO 1:** Un grupo de investigadores desea evaluar la asociación entre el consumo de bebidas azucaradas y la obesidad en adolescentes. Un estudio previo encontró que el 30% de los controles consumían bebidas azucaradas frecuentemente, mientras que en los casos (adolescentes obesos) este porcentaje era del 50%. ([DOI: https://doi.org/10.1016/j.jand.2019.03.011](https://doi.org/10.1016/j.jand.2019.03.011))
+
+¿Cuál sería el tamaño de muestra necesario para detectar esta diferencia?
+
+```{r}
+epi.sscc(OR = 2.33, p0 = 0.30, n = NA, power = 0.80, r = 1, conf.level = 0.95)
+```
+
+es necesario un total de 94 casos y 94 controles. Este cálculo asume una razón de exposición del 30% en controles, un OR esperado de 2.33, poder estadístico del 80% y una relación 1:1 entre casos y controles.
+
+**CASO 2**: Investigadores estudian la relación entre antecedentes familiares de hipertensión arterial y la aparición de hipertensión en adultos jóvenes. Según un estudio anterior, el 40% de los controles tenían antecedentes familiares, en contraste con el 65% de los casos. (DOI: https://doi.org/10.1016/j.jash.2020.07.012)
+
+¿Cuál sería el tamaño de muestra requerido para confirmar esta relación?
+
+```{r}
+epi.sscc(OR = 2.87, p0 = 0.40, n = NA, power = 0.80, r = 1, conf.level = 0.95)
+```
+
+es necesario un total de 59 casos y 59 controles Este cálculo parte de una probabilidad de exposición de 40% en los controles, una razón de momios (OR) de 2.87, poder del 80%, y relación 1:1 entre casos y controles.
+
+**Caso 3:** Un grupo de investigadores desea evaluar la asociación entre el consumo de bebidas energéticas y el riesgo de trastornos del sueño en adolescentes. Un estudio anterior encontró que el 20% de los controles (adolescentes sin trastornos del sueño) consumían bebidas energéticas frecuentemente, mientras que en los casos (adolescentes con trastornos del sueño) este porcentaje era del 35%. ([DOI: https://doi.org/10.1186/s12937-021-00719-z](https://doi.org/10.1186/s12937-021-00719-z) )
+
+¿Cuál sería el tamaño de muestra requerido para confirmar esta relación?
+
+```{r}
+epi.sscc(OR = 2.15, p0 = 0.20, n = NA, power = 0.80, r = 1, conf.level = 0.95)
+```
+
+Es necesario un total de 139 casos y 139 controles . Este cálculo asume una prevalencia de exposición del 20% en controles, un odds ratio (OR) esperado de 2.15, un poder estadístico del 80% y una relación 1:1 entre casos y controles.
+
+# 3. Cálculo de muestra para un estudio de cohorte
+
+**Caso 1:** Un grupo de investigadores desea evaluar o analizar la asociacion entre la duracion de la dialisis previa al trasplante y la mortalidad, y la perdida del injerto censurada por muerte, en dichos oacientes con transplante renal, para ello se analizaron pacientes en un unico centro ambulatorio, , a partir de ellos se recopilaria informacion sobre su evolucion durante 5 años para identificar los casos de falleimiento,Los investigadores buscan tener un 80% de poder estadístico para detectar el riesgo de usar dialisis post-operatorio a difrencia de los que no siguieron la dialisis ([DOI:10.1007/s11255-009-9700-4](https://doi.org/10.1007/s11255-009-9700-4)) utilizando un nivel de significancia del 0.05. Un estudio previo reporta que fallecieron un aproximado de 152 pacientes de 926
+
+**Pregunta:** ¿Cuál sería el tamaño de muestra necesario para los pacientes que siguieron la dilisis y los que dejaron la dialisis?
+
+Para responder, utilizamos la función `epi.sscohortt()`: *Sample size, power or minimum detectable incidence rate ratio for a cohort study using person or animal time data*.
+
+```{r}
+epi.sscohortt(irexp1 = 78/200, irexp0 = 152/926, FT = 5, n = NA, 
+              power = 0.80, r = 1, design = 1, sided.test = 2, 
+              nfractional = FALSE, conf.level = 0.95)
+```
+
+es necesario un total de 53 expuestos y 53 no expuestos a la dialisis, con un 80% de poder estadistico, y un nivel de confianza de 95%
+
+**Caso 2:** Un grupo de investigadores desea evaluar el efecto de la Situación laboral de pacientes con cáncer colorrectal tras cirugía. para ello se usaron datos de pacientes provenientes de japon , se recopilo informacion en un periodo de 12 meses , es decir, 1 año, los investigadores buscan tener un 80% de poder estadistico ([DOI: 10.1097/DCR.0000000000002840](https://doi.org/10.1097/DCR.0000000000002840)), con un nivel de confianza del 0.05, un estudio previo reporta que aproximadamente 43 pacientes retoman rapidamente su estadia laboral de 156 pacientes
+
+**Pregunta:** ¿Cuál sería el tamaño de muestra necesario para determinar pacientes que regresan rapido al entrono laboral y los que no posterior a la cirugia?
+
+`epi.sscohortt()`: *Sample size, power or minimum detectable incidence rate ratio for a cohort study using person or animal time data*.
+
+```{r}
+epi.sscohortt(irexp1 = 25/129, irexp0 = 43/156, FT = 1, n = NA, 
+              power = 0.80, r = 1, design = 1, sided.test = 2, 
+              nfractional = FALSE, conf.level = 0.95)
+```
+
+Es necesario un total de 1189 expuestos y 1189 no expuestos, con un 80% de poder estadistico, y un nivel de confianza de 95%
+
+#### Ejemplo: Asociación entre el consumo excesivo de alcohol y enfermedad hepática
+
+**Caso 3:** Un grupo de investigadores desea evaluar si el consumo excesivo de alcohol está asociado con la incidencia de enfermedad hepática. Se utilizaron datos de pacientes seguidos durante 10 años, con base en un estudio anterior que reportó que 45 de 250 pacientes que consumían alcohol excesivamente desarrollaron enfermedad hepática, comparado con 85 de 980 entre los que no consumían en exceso (DOI:<https://doi.org/10.1016/j.jhep.2015.01.014>)
+
+**Pregunta:** ¿Cuál sería el tamaño de muestra necesario para los pacientes que consumen alcohol excesivamente y los que no?
+
+```{r}
+epi.sscohortt(irexp1 = 45/250, irexp0 = 85/980, FT = 10, n = NA, 
+              power = 0.80, r = 1, design = 1, sided.test = 2, 
+              nfractional = FALSE, conf.level = 0.95)
+
+```
+
+**Resultado:** Es necesario un total de 315 expuestos y 315 no expuestos, con un 80% de poder estadístico y un nivel de confianza de 95%.
+
+### **Ejemplo: Relación entre obesidad y desarrollo de diabetes tipo 2**
+
+**Caso 4:** Un estudio busca analizar si la obesidad está asociada al aumento de la incidencia de diabetes tipo 2 en adultos. Para ello, se analizaron pacientes durante un periodo de seguimiento de 3 años . En un estudio previo se reportó que 60 de 600 personas con obesidad desarrollaron diabetes, mientras que solo 30 de 700 sin obesidad lo hicieron. (DOI:<https://doi.org/10.3389/fendo.2023.1161521>)
+
+**Pregunta:** ¿Cuál sería el tamaño de muestra necesario para pacientes con obesidad y sin obesidad?
+
+```{r}
+epi.sscohortt(irexp1 = 60/600, irexp0 = 30/700, FT = 3, n = NA, 
+              power = 0.80, r = 1, design = 1, sided.test = 2, 
+              nfractional = FALSE, conf.level = 0.95)
+
+```
+
+**Resultado:** Se necesitan 773 expuestos y 773 no expuestos.
+
+### **Ejemplo: Efecto del uso de casco en lesiones graves por accidentes de moto**
+
+**Caso 5:** Investigadores desean analizar el efecto del uso de casco en la reducción de lesiones graves en motociclistas. Se recopilaron datos durante 2 años. Un estudio previo mostró que 15 de 300 motociclistas que usaban casco sufrieron lesiones graves, frente a 50 de 400 que no usaban casco . El objetivo es detectar una diferencia con un 80% de poder estadístico y un 0.05 de nivel de significancia. (DOI:<https://doi.org/10.1016/j.ajem.2023.04.018>)
+
+**Pregunta:** ¿Cuál sería el tamaño de muestra necesario para motociclistas que usan casco y los que no?
+
+Se utilizó la siguiente función:
+
+```{r}
+epi.sscohortt(irexp1 = 15/300, irexp0 = 50/400, FT = 2, n = NA, 
+              power = 0.80, r = 1, design = 1, sided.test = 2, 
+              nfractional = FALSE, conf.level = 0.95)
+
+```
+
+**Resultado:** Se requieren aproximadamente 208 expuestos (que usan casco) y 208 no expuestos (que no usan casco), con 80% de poder estadístico y 95% de confianza.
+
+# 4. Cálculo de poder estadístico
+
+**Caso 1:** Un grupo de investigadores desea evaluar el riesgo o de hipertensión arterial en individuos hiperreactivos cardiovasculares. Para ello, reclutarán participantes de un centro de salud y les hiceron un seguimiento durante 5 años para identificar los casos incidentes de hipertensión arterial. Se planea incluir a 100 personas hiperreactivas y 100 normorreactivos cardiovasculares, con el objetivo de determinar el riesgo que tienen los individuos hiperreactivos cardiovasculares de ser hipertensos. Los investigadores buscan tener un 80% de poder estadístico para detectar un riesgo de hipertensión 2,34 veces mayor en individuos con hiperreactividad cardiovascular que no presentaban un PA optimo ([DOI:](https://doi.org/10.1111/j.1600-6143.2006.01727.x)<https://doi.org/10.21149/8965>), en comparación con aquellos sin hiperreactividad, , utilizando un nivel de significancia de 0.05.
+
+**Pregunta:** ¿Cuál es el poder estadístico con el tamaño de muestra propuesto para cada grupo?
+
+Para responder, utilizamos la función `epi.sscohortt()`: *Sample size, power or minimum detectable incidence rate ratio for a cohort study using person or animal time data*.
+
+```{r}
+epi.sscohortt(irexp1 = 46/103, irexp0 = 10/66, FT = 5, n = 200, 
+              power = NA, r = 1, design = 1, sided.test = 2, 
+              nfractional = FALSE, conf.level = 0.95)
+```
+
+Por lo que con un tamaño de muestra de 100 y un seguimiento de 5 años tendremos un poder estadístico de 99% para aceptar correctamente la hipótesis nula.
+
+**Caso 2:** Un grupo de investigadores desea evaluar el efecto de los niveles de albumina en el riesgo de mortalidad en pacientes con diagnostico de TBC activa. Para ello, reclutarán participantes del Hospital San Jose de Chincha y los seguirán durante 10 años para identificar los casos de fallecimiento. Se planea incluir a 100 pacientes con hipoalbuminemia (\<3.49 g/dL) y a 100 pacientes con albumina \>= 3.4 g/dL , con el objetivo de detectar un riesgo de muerte asociado a la Hipoalbuminemia de 16.23 ([10.30789/rcneumologia.v31.n1.2019.327](http://dx.doi.org/10.30789/rcneumologia.v31.n1.2019.327)), utilizando un nivel de significancia de 0.05. Un estudio previo reportó que, entre los pacientes con TBC activa sin hipoalbuminemia, fallecieron 2 de 142.
+
+Pregunta: ¿Cuál es el poder estadístico con el tamaño de muestra propuesto para cada grupo?
+
+```{r}
+epi.sscohortt(irexp1 = 14/96, irexp0 = 2/142, FT = 10, n = 200, 
+              power = NA, r = 1, design = 1, sided.test = 2, 
+              nfractional = FALSE, conf.level = 0.95)
+```
+
+Conclusión: Con 100 pacientes por grupo y un seguimiento de 10 años este estudio tiene un poder de 99.9% para detectar un irr de 10.35 de pacientes con o sin hipoalbuminemia, lo que significa que este estudio esta razonablemente bien diseñado y consta de un alto poder estadistico.
+
+**Caso 3:** Un grupo de investigadores desea evaluar el sobrepeso y la obesidad como factores de riesgo a presentar estados hipertensivos durante el embarazo. Para ello, reclutarán gestantes del Hospital Regional de Ica y los seguirán durante 10 años para identificar los casos de estados hipertensivos. Se planea incluir a 200 gestantes con sobrepeso y a 200 gestantes con obesidad , con el objetivo de detectar un estado de riesgo a padecer estados hipertensivos en gestantes con obesidad de 3.54 ([10.30789/rcneumologia.v31.n1.2019.327](htpps://10.30789/rcneumologia.v31.n1.2019.327){style="font-size: 11pt;"}), utilizando un nivel de significancia de 0.05. Un estudio previo reportó que, entre los pacientes gestantes con sobrepeso, presentaron estados hipertensivos durante el embarazo 100 de 1200.
+
+Pregunta: ¿Cuál es el poder estadístico con el tamaño de muestra propuesto para cada grupo?
+
+```{r}
+{r}
+epi.sscohortt(irexp1 = 120/580, irexp0 = 100/1200, FT = 10, n = 400, power = NA, 
+              r = 1, design = 1, sided.test = 2, nfractional = FALSE, conf.level = 0.95)
+```
+
+Conclusión: Con 200 gestantes por grupo y un seguimiento de 10 años este estudio tiene un poder de 99.9% para detectar un irr de 2.4 de gestantes con sobrepeso y obesidad.

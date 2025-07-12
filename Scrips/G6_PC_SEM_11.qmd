@@ -1,0 +1,288 @@
+---
+title: "Practica S11_Pc3(1)"
+format: html
+editor: visual
+---
+
+## GRUPO 06
+
+Choquecahua Bendezú Carol Neyduth\
+Clemente Valenzuela Brithney Coraima\
+Cortez Carbonell Dariana Ysabel\
+Felix Yataco Maria Fernanda\
+Huaripuma Lozano Anyelina Yuli\
+Larico Mamani Liz Heydi Patricia
+
+# Cargar paquetes
+
+```{r}
+library(tidyverse)
+library(here)
+library(rio)
+library(gtsummary)
+library(car)
+```
+
+## Cargando los datos
+
+```{r}
+cancer_cervical_0 <- import(here("data", "conoc_actit_factor_cancer_cervical.csv"))
+```
+
+## Sobre los datos para esta práctica
+
+El dataset *cancer_cervical_0* incluye información de 218 personas adultas diagnosticadas con cancer cervical . Contiene datos sobre la practica (correcta o incorrecta), así como otras variables relevantes como edad, antecedentes familiares, educacion, religion, procedencia, entre otras.
+
+# 1 Regresión logística binaria
+
+## 1.1 El problema en este ejercicio
+
+El desenlace de interés para este ejercicio es la variable practica (en el dataset, *practica*). Evaluaremos la relación entre el topo de practica que tienen los pacientes y antecedentes familiares entre pacientes que fueron diagnosticados con cancer cervical.
+
+## 1.2 Estimando OR usando regresión logística para un predictor categórico
+
+Antes de estimar el OR usando regresión logística, debemos convertir la variable antecedente familiar a factor (variable categórica en R). Además, establecemos el nivel "no" como referencia, para así estimar el OR comparando pacientes con cancer cervical que tienen antecedentes familiares frente a aquellos sin antecedentes familiares. Hacemos lo mismo con la variable practica, de modo que "incorrecto" sea la categoría de referencia y "correcto" sea considerado el evento.
+
+```{r}
+cancer_cervical_1 <- cancer_cervical_0 |> 
+  mutate(antec_fam = relevel(as.factor(antec_fam), ref = "no"),
+           practica = relevel(as.factor(practica), ref = "incorrecta"))
+```
+
+A continuación, usamos la función `glm()`, general linear model, con el argumento family = binomial para ajustar una regresión logística y `summary()` para ver los resultados.
+
+```{r}
+regre_log_0 <- glm(practica ~ antec_fam,
+                 family = binomial, 
+                   data = cancer_cervical_1)
+
+summary(regre_log_0)
+```
+
+El coeficiente de regresión *para antec_famsi* (-0.1529) representa el logaritmo del OR para una practica practica correcta, comparando pacientes con antecendentes familiares con pacientes que no presentan antecedentes familiares, al ser negativo quiere decir que tener antecedentes familiares de cancer cervical no representa un riesgo de poderf tener una practica correcta.
+
+Para obtener el OR en sí (como usualmente se reporta en los estudios), exponenciamos el coeficiente usando la función exp()
+
+```{r}
+exp(coef(regre_log_0)[-1]) # [-1] elimina la primera fila, al intercepto.
+```
+
+Se puede visualizar un OR \< 1 (0.8582375) lo cual significa una disminucion aproximada del 15% en presentar los eventos.
+
+Usamos la función `confint()` para calcular los intervalos de confianza (IC) al 95% para el coeficientes de regresión, y exponenciamos estos valores para obtener los IC del 95% para los OR.
+
+```{r}
+exp(confint(regre_log_0))[-1, , drop=F]
+```
+
+En el intervalo (0.4128472 - 1.718785) si se contiene a 1 lo que significa que el tener antecedentes familiares no esta asociado con tener una practica correcta.
+
+En este ejemplo, el predictor categórico tenía solo dos niveles (Si y No), por lo que se obtiene el valor p para probar su asociación con el desenlace (correcto) a partir de la tabla de coeficientes de la regresión (0.672412), sin embargo el p-valor \> 0.05 por lo que la precencia de antecedentes familiares no es un predictor importante en el descenlace.
+
+```{r}
+cancer_cervical_2 <- cancer_cervical_0 |> 
+  mutate(antec_ets = relevel(as.factor(antec_ets), ref = "no"),
+           actitud = relevel(as.factor(actitud), ref = "negativa"))
+```
+
+A continuación, usamos la función `glm()`, general linear model, con el argumento family = binomial para ajustar una regresión logística y `summary()` para ver los resultados.
+
+```{r}
+regre_log_1 <- glm(actitud ~ antec_ets,
+                 family = binomial, 
+                   data = cancer_cervical_2)
+
+summary(regre_log_1)
+```
+
+El coeficiente de regresión *para antec_etssi* (-0.9189) representa el logaritmo del OR para una practica practica correcta, comparando pacientes con antecendentes familiares con pacientes que no presentan antecedentes ets, al ser negativo quiere decir que tener antecedentes familiares de cancer cervical no representa un riesgo de poderf tener una actitud negativa.
+
+Para obtener el OR en sí (como usualmente se reporta en los estudios), exponenciamos el coeficiente usando la función exp()
+
+```{r}
+exp(coef(regre_log_1)[-1]) # [-1] elimina la primera fila, al intercepto.
+```
+
+Se puede visualizar un OR \< 1 (0.3989501) lo cual significa una disminucion aproximada del 15% en presentar los eventos.
+
+Usamos la función `confint()` para calcular los intervalos de confianza (IC) al 95% para el coeficientes de regresión, y exponenciamos estos valores para obtener los IC del 95% para los OR.
+
+```{r}
+exp(confint(regre_log_1))[-1, , drop=F]
+```
+
+En el intervalo (0.1292596- 1.149572) si se contiene a 1 lo que significa que el tener antecedentes ets no esta asociado con tener una actitud negativa.
+
+En este ejemplo, el predictor categórico tenía solo dos niveles (Si y No), por lo que se obtiene el valor p para probar su asociación con el desenlace (correcto) a partir de la tabla de coeficientes de la regresión (0.092754), sin embargo el p-valor \> 0.05 por lo que la precencia de antecedentes ets no es un predictor importante en el descenlace.
+
+## 1.3 Interpretando los resultados
+
+Los pacientes con cancer cervical con antecedentes familiares tienen menores odds de presentar una practica correcta en comparación a paciente con cancer cervical sin antecedentes familiares (OR = 0.8582375; IC 95% = 0.4128472 , 1.718785; p = 0.672412). Específicamente, tienen aproximadamente 15% menos odds de presentar el desenlace.
+
+## 1.4 Estimando OR usando regresión logística para un predictor numérico
+
+Usando el mismo dataset, la siguiente pregunta que intentaremos responder usando regresión logística es ¿cuál es la asociación entre los antecedentes familiares y la edad en pacientes con cancer cervical?
+
+## 1.5 Ajustamos el modelo
+
+```{r}
+regre_log_1 <- glm(antec_fam ~ edad, family = binomial, data = cancer_cervical_1)
+
+summary(regre_log_1)$coef
+```
+
+El coeficiente de regresión para la edad (0.0082) indica cuánto cambia el logaritmo de las odds de antecedentes por cada aumento de un año en la edad. Si convertimos esto a un OR exponenciandolos, obtenemos:
+
+```{r}
+exp(coef(regre_log_1)[-1])
+```
+
+Finalmente, calcula un intervalo de confianza del 95% para el OR usando `confint()` y exponenciando los resultados.
+
+```{r}
+exp(confint(regre_log_1)[-1,])
+```
+
+## 1.7 Interpretando el resultado
+
+Entre las pacientes con cáncer cervical, la edad no está significativamente asociada con los antecedentes familiares (OR = 1.00; IC 95% = 0.98–1.03; p \> 0.05). Esto indica que por cada año adicional de edad, no hay un aumento significativo en las odds de tener antecedentes familiares.
+
+## 1.8 Cómo reportar los resultados de una regresión logística para un reporte científico.
+
+Aquí usamos funciones que ya hemos empleado en sesiones anteriores. tbl_uvregression() es la función que permite producir tablas con resultados de la regresión logística. Como argumento incluye el tipo de regresión, variables y otras especificaciones.
+
+```{r}
+theme_gtsummary_language(language = "es")
+```
+
+Para este ejercicio hacemos que `practica` sea un factor binario
+
+```{r}
+cancer_cervical_0 <- cancer_cervical_0 |>
+  mutate(practica = factor(practica, levels = c("incorrecta", "correcta")))
+```
+
+```{r}
+tabla_reg_logi <- cancer_cervical_0 |>
+  tbl_uvregression(
+    include = c(edad, religion, antec_fam),  # Puedes agregar más aquí
+    y = practica,
+    method = glm,
+    method.args = list(family = binomial),
+    exponentiate = TRUE,
+    conf.int = TRUE,
+    hide_n = TRUE,
+    add_estimate_to_reference_rows = FALSE,
+    pvalue_fun = ~ style_pvalue(.x, digits = 3),
+    estimate_fun = ~ style_number(.x, digits = 2),
+    label = list(
+      edad ~ "Edad (años)",
+      religion ~ "Religión",
+      antec_fam ~ "Antecedente Familiar"
+    )
+  ) |>
+  bold_labels() |>
+  bold_p(t = 0.05) |>
+  modify_header(estimate = "**OR no ajustado**", p.value = "**valor p**")
+```
+
+Imprime la tabla
+
+```{r}
+tabla_reg_logi
+```
+
+## 2 Regresión de Poisson
+
+La regresión de Poisson es un modelo de regresión para datos de conteo y de tasas. Al igual que el modelo de regresión logística, este es un tipo de modelo lineal generalizado que se usa cuando el desenlace (variable dependiente) es un conteo. Aunque los datos de conteo y tasas son muy comunes en medicina y ciencias de la salud, la regresión de Poisson está subutilizada en la investigación médica.
+
+Básicamente, la regresión de Poisson modela la relación lineal entre:
+
+Desenlace: variable de conteo (por ejemplo, número de hospitalizaciones, paridad, lesiones cancerosas, ataques asmáticos). Esta variable se transforma a escala de logaritmo natural.
+
+Predictores/variables independientes: variables numéricas (por ejemplo, edad, presión arterial) y variables categóricas (por ejemplo, raza, género, nivel educativo).
+
+Usando la regresión de poisson, podemos evaluar: La relación entre el número de ataques asmáticos en el último año y los factores sociodemográficos.
+
+En la sección anterior, reportamos como medida de efecto OR para la regresión logística. Para la regresión de Poisson, al tomar el exponente del coeficiente, obtenemos la razón de tasas (rate ratio, RR), también conocida como razón de tasas de incidencia (incidence rate ratio, IRR).
+
+## 2.1 Sobre los datos para esta práctica
+
+El dataset cancer_cervical_0 incluye información de un grupo de 218 mujeres diagnosticadas con cáncer de cuello uterino. El conjunto de datos contiene 18 variables que recogen aspectos sociodemográficos, antecedentes médicos, comportamiento sexual y nivel de conocimiento sobre el cáncer cervical.
+
+## 2.2 El problema en este ejercicio
+
+Usando regresión logística binaria, evaluaremos la relación entre el nivel de práctica preventiva frente al cáncer cervical (variable *practica*) y diversos factores sociodemográficos, antecedentes personales y características conductuales. La variable *practica* representa si la participante realiza prácticas preventivas correctas o incorrectas, y será utilizada como desenlace en el análisis.
+
+## 2.3 Ajustamos modelos de regresión de Poisson
+
+Ahora, ajustamos modelos de regresión de Poisson para las 3 variables predictoras usando la función glm(). Seguido a esto, usamos summary() para ver los resultados
+
+Para la variable educacion
+
+```{r}
+reg_poisson1 <- glm(num_hijos ~ n_educacion, data = cancer_cervical_0, family = "poisson")
+summary(reg_poisson1)
+```
+
+Mediante regresión de Poisson, se encontró que las mujeres con educacion superior tuvieron en promedio un 50% menos hijos que aquellas con educación primaria p = 0.0028 en el caso de la educación secundaria la reducción fue del 35% aunque no fue estadísticamente significativa (p = 0.0747). Esto indica una asociación inversa entre el nivel educativo y la cantidad de hijos
+
+Para la variable procedencia
+
+```{r}
+reg_poisson2 <- glm(num_hijos ~ procedencia, data = cancer_cervical_0, family = "poisson")
+summary(reg_poisson2)
+```
+
+Mediante regresión de Poisson, se encontro que las mujeres de procedencia urbana tuvieron, en promedio 6% menos hijos que aquellas de zona rural aunque esta diferencia no fue estadísticamente significativa p = 0.532 por tanto no se evidenció asociación entre la procedencia y el número de hijos
+
+```{r}
+reg_poisson3 <- glm(num_hijos ~ edad + religion, data = cancer_cervical_0, family = "poisson")
+summary(reg_poisson3)
+```
+
+Mediante regresion de Poisson se encontro que a mayor edad el numero de hijos aumenta de forma significativa p \< 0.001 en promedio, cada año adicional de edad se asoció con un 3.5% más hijos por otro lado no se observaron diferencias estadísticamente significativas en el número de hijos según la religión (evangélica o ninguna) en comparación con el grupo católico
+
+## 2.4 Cómo interpretar y reportar los resultados de una regresión de Poisson
+
+Como en la sección anterior, usamos tbl_regression() para generar una tabla con los resultados. Aquí, para la interpretación, exponenciamos los coeficientes para obtener la razón de tasas de incidencia (IRR).
+
+```{r}
+tabla_reg_poisson <- cancer_cervical_0 |>
+  tbl_uvregression(
+    include = c(n_educacion, procedencia, edad),
+    y = num_hijos,
+    method = glm,
+    method.args = list(family = poisson),
+    exponentiate = TRUE,
+    conf.int = TRUE,
+    hide_n = TRUE,
+    add_estimate_to_reference_rows = FALSE,
+    pvalue_fun = ~ style_pvalue(.x, digits = 3),
+    estimate_fun = ~ style_number(.x, digits = 2),
+    label = list(
+      n_educacion ~ "Nivel educativo",
+      procedencia ~ "Procedencia",
+      edad ~ "Edad (años)"
+    )
+  ) |>
+  bold_labels() |>
+  bold_p(t = 0.05) |>
+  modify_header(estimate = "**IRR no ajustado**", p.value = "**valor p**")
+```
+
+Imprime la tabla
+
+```{r}
+tabla_reg_poisson
+```
+
+Basándonos en la tabla, podemos interpretar los resultados de la siguiente manera:
+
+Las mujeres con educación secundaria tuvieron, en promedio, un 35% menos hijos que aquellas con educación primaria, aunque esta diferencia no fue estadísticamente significativa (IRR: 0.65; IC 95%: 0.41 – 1.08; p = 0.075).
+
+Las mujeres con educación superior presentaron un 51% menos hijos que aquellas con educación primaria, y esta diferencia fue estadísticamente significativa (IRR: 0.49; IC 95%: 0.32 – 0.81; p = 0.003).
+
+Respecto a la procedencia, no se encontraron diferencias significativas entre las mujeres de zona urbana y las de zona rural en cuanto al número de hijos (IRR: 0.94; IC 95%: 0.78 – 1.13; p = 0.532).
+
+Finalmente, por cada año adicional de edad, el número de hijos aumenta en promedio un 4%, siendo esta asociación estadísticamente significativa (IRR: 1.04; IC 95%: 1.03 – 1.05; p \< 0.001).

@@ -1,0 +1,422 @@
+---
+title: "G6- PRACTICA SEM 9"
+format: html
+editor: visual
+---
+
+## GRUPO 06
+
+Choquecahua Bendezú Carol Neyduth\
+Clemente Valenzuela Brithney Coraima\
+Cortez Carbonell Dariana Ysabel\
+Felix Yataco Maria Fernanda\
+Huaripuma Lozano Anyelina Yuli\
+Larico Mamani Liz Heydi Patricia
+
+# Cargar paquetes
+
+```{r}
+library(tidyverse)
+library(here)
+library(rio)
+library(gtsummary)
+library(car)
+```
+
+# Cargando los datos
+
+```{r}
+data_cancer_cervical_0 <- import(here("data", "conoc_actit_factor_cancer_cervical.csv"))
+```
+
+# Sobre los datos para esta práctica
+
+El dataset data_cancer_cervical_0, de 218 personas adultas (\>=25 años de edad), contiene datos demográficos como el estado marital, nivel de educacion, religion, antecedentes familiares, etnia, procedencia y otros datos.
+
+# 1. Regresión lineal simple
+
+Regresión es una método para evaluar la asociación entre una variable dependiente (tambien llamado desenlace Y) y una o varias variables independientes (predictoras X1, X2,..., Xk). Los modelos de regresión lineal simple (o univariable) utilizan solo solo una variable independiente o predictora X.
+
+## 1.1 El problema en este ejercicio
+
+El desenlace *Y* de interés para este ejercicio es la variable edad. Veamos la distribución de la variable y el promedio en en un histograma.
+
+```{r}
+data_cancer_cervical_0 |>  
+  ggplot(aes(x = edad)) +
+  geom_histogram(
+    color = "black",
+    ) + 
+  labs(y = "Frecuencia", 
+       x = "Edad") +
+  geom_vline(xintercept = mean(data_cancer_cervical_0$edad, na.rm = TRUE),
+             color = "darkblue", size = 1.5)
+```
+
+En estos datos, el promedio de la edad es:
+
+```{r}
+mean(data_cancer_cervical_0$edad, na.rm = TRUE)
+```
+
+El desenlace *Y* de interés para este ejercicio es la variable edad relación sexual. Veamos la distribución de la variable y el promedio en en un histograma.
+
+```{r}
+data_cancer_cervical_0 |>  
+  ggplot(aes(x = edad_relacion_sexual)) +
+  geom_histogram(
+    color = "skyblue",
+    ) + 
+  labs(y = "Frecuencia", 
+       x = "Edad relación sexual") +
+  geom_vline(xintercept = mean(data_cancer_cervical_0$edad_relacion_sexual, na.rm = TRUE),
+             color = "darkred", size = 1.5)
+```
+
+En estos datos, el promedio de la edad relación sexual es:
+
+```{r}
+mean(data_cancer_cervical_0$edad_relacion_sexual, na.rm = TRUE)
+```
+
+El desenlace *Y* de interés para este ejercicio es la variable parejas sexuales. Veamos la distribución de la variable y el promedio en en un histograma.
+
+```{r}
+data_cancer_cervical_0 |>  
+  ggplot(aes(x = parejas_sex)) +
+  geom_histogram(
+    color = "white",
+    ) + 
+  labs(y = "Frecuencia", 
+       x = "Parejas sexuales") +
+  geom_vline(xintercept = mean(data_cancer_cervical_0$parejas_sex, na.rm = TRUE),
+             color = "purple", size = 1.5)
+```
+
+En estos datos, el promedio de la parejas sexuales es:
+
+```{r}
+mean(data_cancer_cervical_0$parejas_sex, na.rm = TRUE)
+```
+
+El desenlace *Y* de interés para este ejercicio es la variable número de hijos. Veamos la distribución de la variable y el promedio en en un histograma.
+
+```{r}
+data_cancer_cervical_0 |>  
+  ggplot(aes(x = num_hijos)) +
+  geom_histogram(
+    color = "darkgreen",
+    ) + 
+  labs(y = "Frecuencia", 
+       x = "Número de hijos") +
+  geom_vline(xintercept = mean(data_cancer_cervical_0$num_hijos, na.rm = TRUE),
+             color = "pink", size = 1.5)
+```
+
+En estos datos, el promedio de la número de hijos es:
+
+```{r}
+mean(data_cancer_cervical_0$num_hijos, na.rm = TRUE)
+```
+
+## 1.2 Notación en el método de regresión lineal simple
+
+El método de regresión lineal simple encuentra la línea que mejor se ajusta a la descripción lineal entre la edad y la parejas sexuales, tal como se muestra en la siguiente figura:
+
+```{r}
+plot(edad ~ parejas_sex , data = data_cancer_cervical_0,
+     col = "skyblue",
+     ylab = "Edad",
+     xlab = "Parejas sexuales",
+     las = 1,
+     pch = 20, 
+     font.lab = 2, font.axis = 2) 
+
+# La función lm() ajusta el modelo de regresión lineal
+abline(lm(edad ~ parejas_sex , data = data_cancer_cervical_0), lwd = 2, col = "blue")
+```
+
+Entre el número de hijos y la edad relación sexual, tal como se muestra en la siguiente figura:
+
+```{r}
+plot(num_hijos ~ edad_relacion_sexual , data = data_cancer_cervical_0,
+     col = "orange",
+     ylab = "Número de hijos",
+     xlab = "Edad relación sexual",
+     las = 1,
+     pch = 20, 
+     font.lab = 2, font.axis = 2) 
+
+# La función lm() ajusta el modelo de regresión lineal
+abline(lm(num_hijos ~ edad_relacion_sexual , data = data_cancer_cervical_0), lwd = 2, col = "red")
+```
+
+Entre el número de parejas sexuales y el número de hijos, tal como se muestra en la siguiente figura:
+
+```{r}
+plot(parejas_sex ~ num_hijos , data = data_cancer_cervical_0,
+     col = "purple",
+     ylab = "Parejas sexuales",
+     xlab = "Número de hijo",
+     las = 1,
+     pch = 20, 
+     font.lab = 2, font.axis = 2) 
+
+# La función lm() ajusta el modelo de regresión lineal
+abline(lm(parejas_sex ~ num_hijos , data = data_cancer_cervical_0), lwd = 2, col = "brown")
+```
+
+## 1.3 Ajustando el modelo de regresión lineal simple para nuestro problema
+
+En R, usamos la función lm() para ajustar un modelo de regresión lineal. "lm" es la abreviatura para "linear model". Dentro de la función debemos indicarle como argumentos el desenlace X, el predictor Y y la data donde se encuentran las variables. Esta es la estructura para ajustar el modelo con la función lm: lm(y \~ x, data = mis_datos).
+
+Ajustando el modelo para nuestros datos
+
+```{r}
+modelo_ejemplo1 = lm(edad ~ num_hijos, data = data_cancer_cervical_0)
+```
+
+Para ver los resultados, usamos la función summary() y dentro, el objeto modelo_ejemplo.
+
+```{r}
+summary(modelo_ejemplo1)
+```
+
+## 1.4 Interpretando los resultados
+
+La sección Coefficients del resultado:
+
+```{r}
+summary(modelo_ejemplo1)$coef
+```
+
+muestra las estimaciones y las pruebas de hipótesis para el **intercepto (β₀)** , etiquetado como **(Intercept)** , y para el coeficiente del predictor (la pendiente, β₁), etiquetado como **num_hijos** .
+
+En esta misma sección, la columna **Estimate** muestra los coeficientes estimados del modelo de regresión lineal simple. Así, el modelo que mejor se ajusta tiene un intercepto de **35.919543** y una pendiente de **4.606992** para el predictor **num_hijos** .
+
+La tabla de coeficientes también muestra el **error estándar** de cada estimación, su **valor t** y su **valor p** (etiquetado como **Pr(\>\|t\|)** ). El valor p del intercepto usualmente no es de interés, pero el valor p del predictor ( **num_hijos** ) prueba la hipótesis nula de que el desenlace NO tiene asociación con el predictor o, dicho de otra manera, que la pendiente es cero. La hipótesis nula plantea que la línea de mejor ajuste es una línea horizontal, lo que indicaría que el promedio esperado del desenlace es el mismo en todos los valores del predictor; es decir, que no existe asociación entre el desenlace (edad) y el predictor ( **num_hijos** ).
+
+Finalmente, el valor R-cuadrado es una medida de bondad de ajuste que varía entre 0 (sin asociación) y 1 (asociación lineal perfecta), y corresponde al cuadrado de la correlación de Pearson entre el desenlace y el predictor. Se interpreta como la proporción de la variación en el desenlace que es explicada por el modelo. En nuestro modelo, el R² (R-cuadrado) es 0.2911. Esto significa que aproximadamente el 29.11% de la variación en los valores de la edad reflejada en los numeros de hijos.
+
+## 1.5 ¿Cómo reportar los resultados del ajuste del modelo de regresión lineal simple?
+
+Para reportar los resultados de un modelo de regresión lineal simple, es importante incluir los siguientes elementos:
+
+-   La forma general del modelo estimado.
+
+-   El valor de los coeficientes estimados (intercepto y pendiente).
+
+-   El valor p del predictor para evaluar la significancia estadística.
+
+-   El R-cuadrado como medida de la bondad de ajuste del modelo.
+
+-   Una interpretación contextual de los resultados.
+
+**Ejemplo de cómo reportar:**
+
+```{r}
+modelo_ejemplo1 <- lm(edad ~ num_hijos, data = data_cancer_cervical_0)
+summary(modelo_ejemplo1)
+```
+
+Los resultados del modelo indican que:
+
+-    El **intercepto** es 35.92, lo que representa la edad estimada para una persona con 0 hijos.
+
+-   La **pendiente** asociada al número de hijos es 4.61, lo que indica que por cada hijo adicional, la edad promedio aumenta en 4.61 años.}
+
+-   El coeficiente del predictor `num_hijos` es **estadísticamente significativo** (*p* \< 0.05), lo cual sugiere que existe una asociación entre la edad y el número de hijos.
+
+-   El **coeficiente de determinación** (*R²*) es **0.2911**, lo que implica que el modelo explica aproximadamente el **29.11%** de la variación observada en la edad.
+
+    **Conclusión:**\
+
+    El modelo indica una relación positiva y significativa entre el número de hijos y la edad de las personas en la muestra. Esto sugiere que, en promedio, a mayor número de hijos, mayor es la edad de las personas estudiadas.
+
+# 2 Prueba t de Student para muestras independientes
+
+-   Hipótesis nula (H₀): No hay diferencia entre las medias de los dos grupos. $$
+    H_0: \mu_1 = \mu_2
+    $$
+-   Hipótesis alternativa (H₁): Hay una diferencia entre las medias de los dos grupos. $$
+    H_1: \mu_1 \neq \mu_2
+    $$
+
+## 2.2 Sobre los datos
+
+El dataset data_cancer_cervical, de 218 personas adultas (\>=25 años de edad), contiene datos demograficos y sociodemograficos como edad (años), etnia,procedencia ocupacion,etc.
+
+## 2.3 Resumen y visualización
+
+## Resumen
+
+Antes de realizar la prueba t de Student es importante conocer la distribución de los datos e identificar si hay valores perdidos o atípicos. Empecemos por el resumen:
+
+```{r}
+group_by(data_cancer_cervical_0,procedencia) |> 
+  summarise(
+    count = n(),
+    mean = mean(edad_relacion_sexual, na.rm = TRUE),
+    sd = sd(edad_relacion_sexual, na.rm = TRUE)
+  )
+```
+
+Visualización
+
+```{r}
+data_cancer_cervical_0 |>  
+  filter(!is.na(procedencia)& !is.na(edad_relacion_sexual))  |> 
+  ggplot(aes(y = edad_relacion_sexual, x = procedencia)) +
+  geom_boxplot() +
+  labs(y = "edad de relacion sexual (años)", x = "procedencia")
+```
+
+## 2.4 Pruebas preliminares para evaluar los supuestos de la prueba t de Student
+
+Supuesto 1: los datos deben haber sido muestreados de una distribución normal.
+
+Para esto, usamos la prueba de Shapiro-wilk
+
+```{r}
+data_cancer_cervical_0 |> 
+  filter(procedencia == "rural") |> 
+  summarise(shapiro = list(shapiro.test(edad_relacion_sexual))) |> 
+  pull(shapiro)
+```
+
+```{r}
+data_cancer_cervical_0 |> 
+  filter(procedencia == "urbano") |> 
+  summarise(shapiro = list(shapiro.test(edad_relacion_sexual))) |> 
+  pull(shapiro)
+```
+
+Supuesto 2: p-valor \> 0.05 en ambas variables, Las varianzas de los dos grupos son iguales Para esto podemos usar la prueba F para evaluar la homogeneidad de varianzas. Esto esta implementado en la función var.test()
+
+```{r}
+var.test(edad_relacion_sexual ~ procedencia, data = data_cancer_cervical_0)
+```
+
+El valor p de la prueba F es p = 0.3106. Es mayor que el nivel de significancia α = 0.05. En conclusión, no hay una diferencia significativa entre las varianzas de los dos conjuntos (rural y urbano) de datos. Por lo tanto, podemos usar la prueba t clásica que asume igualdad de varianzas.
+
+## 2.5 Realizamos la prueba t para nuestros datos.
+
+```{r}
+t.test(edad_relacion_sexual ~ procedencia, data = data_cancer_cervical_0, var.equal = TRUE)
+```
+
+**Interpretando los resultados**
+
+El valor p de la prueba es 0.6904, lo cual es mayor que el nivel de significancia α = 0.05. Por lo tanto, podemos concluir que la edad de relacion sexual promedio de procedencia rural no es significativamente diferente de la edad de relacion sexual promedio segun prodedencia urbana.
+
+# 3 Análisis de Varianza (ANOVA)
+
+El análisis de varianza (ANOVA), especificamente el ANOVA de una vía, es una extensión de la prueba t para muestras independientes cuando se comparan medias entre más de dos grupos. En el ANOVA de una vía, los datos se organizan en varios grupos basados en una única variable de agrupación (también llamada variable de factor). En este ejecicio, evaluamos si el tipo practica sexual es significativamente distinto segun el numero de parejas sexuales.
+
+## 3.1 ¿Cuándo usar el ANOVA de una vía?
+
+-   Las observaciones se obtienen de forma independiente y aleatoria de la población definida por los niveles del factor.
+
+-   Los datos de cada nivel del factor se distribuyen normalmente.
+
+-   Hipótesis nula (H₀): No hay diferencia entre las medias de los dos grupos.
+
+-   Estas poblaciones normales tienen una varianza común. (Se puede usar la prueba de Levene para verificar esto.)
+
+## 3.2 Sobre los datos para esta práctica
+
+El dataset data cancer cervical de 218 personas adultas contiene datos de practica, la variable parejas sexuales y otros datos demográficos.
+
+## 3.3 Resumen y visualización
+
+Resumen
+
+Antes de realizar la prueba de ANOVA es importante conocer la distribución de los datos e identificar si hay atípicos. Empecemos por el resumen:
+
+```{r}
+group_by(data_cancer_cervical_0, practica) |> 
+  summarise(
+    count = n(),
+    mean = mean(parejas_sex, na.rm = TRUE),
+    sd = sd(parejas_sex, na.rm = TRUE),
+    min = min(parejas_sex, na.rm = TRUE),
+    max = max(parejas_sex, na.rm = TRUE)
+  )
+```
+
+Resultados de el número de parejas sexuales según el tipo de práctica preventiva
+
+Segun COUNT Hay 77 mujeres con práctica correcta y 141 mujeres con práctica incorrecta
+
+Segun MEAN ambas practicas tienen prácticamente el mismo promedio de parejas
+
+Es mayor en el grupo de práctica incorrecta 1.85 y 1.38 lo que implica que en ese grupo hay mas variabilidad en el número de parejas sexuales
+
+**Visualización:**
+
+```{r}
+data_cancer_cervical_0 |>  
+  filter(!is.na(practica)& !is.na(parejas_sex))  |> 
+  ggplot(aes(y = parejas_sex, x = practica)) +
+  geom_boxplot() +
+  labs(y = "Parejas sexuales", x = "Practica")
+```
+
+El grafico muestra que tanto las mujeres con practicas correctas como incorrectas tienen un nuumero similar de parejas sexuales en promedio pero en el grupo con practicas incorrectas hay mas variación: algunas tienen muchas parejas hasta 15 y otras ninguna.
+
+## 3.4 Pruebas preliminares para evaluar los supuestos del ANOVA
+
+```{r}
+data_cancer_cervical_0 <- data_cancer_cervical_0 |>
+    mutate(practica = as.factor(practica))
+```
+
+Supuesto 1: los datos deben haber sido muestreados de una distribución normal.
+
+Para esto, usamos la prueba de Shapiro-wilk.
+
+```{r}
+data_cancer_cervical_0 |> 
+  filter(practica == "correcta") |> 
+  summarise(shapiro = list(shapiro.test(parejas_sex))) |> 
+  pull(shapiro)
+```
+
+Como el p valor es menor que 0.05 se rechaza la hipotesis nula y por eso los datos no siguen una distribucion normal
+
+```{r}
+data_cancer_cervical_0 |> 
+  filter(practica == "incorrecta") |> 
+  summarise(shapiro = list(shapiro.test(parejas_sex))) |> 
+  pull(shapiro)
+```
+
+Como el p valor es menor que 0.05 se rechaza la hipotesis nula y por eso los datos no siguen una distribucion normal
+
+**Supuesto 2:** Las varianzas de los dos grupos son iguales Para esto podemos usar la prueba de Levene para evaluar la homogeneidad de varianzas. Esto esta implementado en la función var.test()
+
+```{r}
+leveneTest(parejas_sex ~ practica, data = data_cancer_cervical_0)
+```
+
+El valor p de la prueba F es p = 0.4098. Es mayor que el nivel de significancia α = 0.05. En conclusion, no hay una diferencia significativa entre las varianzas de los dos conjuntos de datos (practica correcta e incorrecta). Por lo tanto, podemos usar la prueba t clasica que asume igualdad de varianzas.
+
+## 3.5 Realizamos la prueba de ANOVA de una vía para nuestros datos.
+
+```{r}
+res_anova = aov(parejas_sex ~ practica, data = data_cancer_cervical_0)
+```
+
+```{r}
+summary(res_anova)
+```
+
+dado que el valor p es 0.986 y es mayor que el nivel de significancia 0.05, podemos concluir que no existen diferencias significativas entre los grupos de practica (correcta e incorrecta) en cuanto al numero de parejas sexuales.
+
+Aunque para este ejecicio no hemos encontrado una diferencia estadísticamente significativa, cuando sí lo hay, es importante realizar una prueba de comparación por pares para saber dónde se encuentra la diferencia. Para esto, se puede utilizar la prueba Tukey HSD (Tukey Honest Significant Differences)
+
+```{r}
+TukeyHSD(res_anova)
+```
+
+Dado que el valor p ajustado es 0.9863 y es mayor que el nivel de significancia 0.05, podemos concluir que no existe una diferencia significativa en el número de parejas sexuales entre los grupos con practica correcta e incorrecta segun la prueba de comparaciones múltiples de tukey

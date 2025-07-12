@@ -1,0 +1,325 @@
+---
+title: "actividad semana 7"
+format: html
+editor: visual
+---
+
+**GRUPO 06**
+
+-   *Choquecahua Bendezú Carol Neyduth*
+
+-   *Clemente Valenzuela Brithney Coraima*
+
+-   *Cortez Carbonell Dariana Ysabel*
+
+-   *Felix Yataco Maria Fernanda*
+
+-   *Huaripuma Lozano Anyelina Yuli*
+
+-   *Larico Mamani Liz Heydi Patricia*
+
+### Glosario introductorio
+
+**1. Modelo estadístico**\
+Es una representación matemática que describe relaciones entre variables. Se utiliza para hacer inferencias, predicciones o entender el comportamiento de los datos.
+
+**2. Variable continua**\
+Tipo de variable numérica que puede tomar un número infinito de valores dentro de un rango (por ejemplo, niveles de glucosa o circunferencia de cintura).
+
+**3. Distribución de probabilidad**\
+Describe cómo se distribuyen los valores posibles de una variable aleatoria. Algunas distribuciones comunes incluyen la normal, binomial y chi-cuadrado.
+
+**4. Hipótesis nula (H₀)**\
+Proposición que se plantea al inicio de una prueba estadística y que indica la ausencia de efecto o diferencia. Se rechaza o no según el valor p obtenido.
+
+**5. Valor p**\
+Probabilidad de obtener un resultado igual o más extremo que el observado, si la hipótesis nula fuera cierta. Un valor p menor a 0.05 suele considerarse estadísticamente significativo.
+
+# ¿Que son las pruebas de bondad de ajuste?
+
+Las pruebas de bondad de ajust**e** evalúan qué tan bien los datos observados se ajustan a los valores esperados según un modelo estadístico.
+
+La bondad de ajuste puede evaluarse en al menos dos escenarios principales: \### 1. En modelos de regresión
+
+Por ejemplo, un estudiante podría aplicar un modelo de regresión lineal para evaluar la relación entre el peso de los pacientes de un hospital y su nivel de glucosa. Para determinar si el modelo es adecuado para explicar esta relación, se puede calcular el estadístico de bondad de ajuste R².
+
+El estadístico R² mide el porcentaje de variabilidad de la variable dependiente (en este caso, el nivel de glucosa) que es explicado por el modelo de regresión. Cuanto mayor sea el valor de R², mejor será el ajuste del modelo a los datos observados.
+
+### 2. En distribuciones de probabilidad
+
+En algunos casos, el modelo estadístico que se desea aplicar requiere que los datos sigan una distribución de probabilidad específica, como la distribución normal.
+
+Por otro lado, muchas pruebas de hipótesis utilizan **estadísticos de prueba** (no necesariamente modelos completos). Por ejemplo:
+
+-   Las **pruebas t** (t de Student) usan el estadístico *t*.
+
+-   El **ANOVA** usa el estadístico *F*.
+
+-   Las **pruebas de chi-cuadrado** usan el estadístico χ².
+
+Estas pruebas se basan en las distribuciones teóricas de estos estadísticos para calcular los valores p, los cuales permiten decidir si aceptar o rechazar la hipótesis nula.
+
+Este esta sesión práctica se enfocará en el segundo escenario.
+
+# Cargamos los paquetes necesarios
+
+```{r}
+library(rio)
+library(here)
+```
+
+# Cargar los datos
+
+```{r}
+data_cancer_cervical_0 <- import(here("data", "conoc_actit_factor_cancer_cervical.csv"))
+```
+
+# 1. Para datos continuos
+
+La prueba t de Student y el ANOVA son dos pruebas estadísticas ampliamente utilizadas que permiten evaluar si el valor promedio de una variable numérica difiere entre dos o más grupos o categorías.
+
+Ambas pruebas asumen que la variable continua sigue una distribución normal.\
+Pero, ¿cómo podemos comprobar si esta condición se cumple?\
+Mediante una prueba de bondad de ajuste.
+
+Una de las pruebas más comunes para evaluar la normalidad de una variable numérica es la prueba de Shapiro-Wilk. Esta prueba permite determinar si los datos provienen de una distribución normal, lo cual es un requisito clave antes de aplicar pruebas como la t de Student o el ANOVA.
+
+## Para la variable edad
+
+Esta variable corresponde a la edad que tiene cada persona evaluada
+
+```{r}
+shapiro.test(data_cancer_cervical_0$edad)
+```
+
+**INTERPRETACION:**
+
+**Estadistico de prueba= 0.92559**
+
+**P-value= 0,000000004845**
+
+CONCLUSION:
+
+p-value= 0,000000004845 \< nivel de significancia 0.05 , por lo tanto se rechaza la Hipotesis nula y se acepta la hipotesis alterna, eso quiere decir que los datos corrspondiente a la variable edad no presentan una distribución normal.
+
+## Para la variable num_hijos
+
+Esta variable corresponde a la cantidad de hijos que tiene cada persona evaluada
+
+```{r}
+shapiro.test(data_cancer_cervical_0$num_hijos)
+```
+
+**INTERPRETACION:**
+
+**Estadistico de prueba= 0.93222**
+
+**P-value= 0,0000000169**
+
+CONCLUSION:
+
+p-value= 0,0000000169 \< al nivel de significancia 0.05, por lo tanto se rechaza la Hipotesis nula y se acepta la hipotesis alterna, lo cual significa que los datos correspondientes a la variable número de hijos no presenta una distribucion normal.
+
+## para la variable parejas_sex
+
+esta variable corresponde a la cantidad de parejas sexuales que ha tenido cada persona
+
+```{r}
+shapiro.test(data_cancer_cervical_0$parejas_sex)
+```
+
+**INTERPRETACION:**
+
+**Estadistico de prueba= 0.62534**
+
+**P-value= 0,00000000000000022**
+
+CONCLUSION:
+
+p-value= 0,00000000000000022 \< al nivel de significancia 0.05 , por lo tanto se rechaza la Hipotesis nula y se acepta la hipotesis alterna, por lo tanto los datos correspondientes a la variable de pareja sexual no tienen una distribucion normal.
+
+## para la variable edad_relacion_sexual
+
+esta variable corresponde a la edad en la que tuvieron por primera vez relaciones sexuales
+
+```{r}
+shapiro.test(data_cancer_cervical_0$edad_relacion_sexual)
+```
+
+**INTERPRETACION:**
+
+Estadistico de prueba= 0.89182
+
+p-value= 0,0000000000204
+
+CONCLUSION:
+
+p-value= 0,0000000000204 \< al nivel de significancia 0.05, por lo tanto se rechaza la Hipotesis nula y se acepta la hipotesis alterna, en este caso los datos correspondientes a la variable edad de relación sexual tampoco presentan una distribución normal.
+
+# 2. Para datos categoricos
+
+## para la variable antecedente ETS:
+
+En relacion a nuestra data "`data_cancer_cervical"` contiene información sobre el antecedente de ETS. En esta muestra, el número de participantes con antecedentes de ETS es 15 de un total de 218.
+
+```{r}
+table(data_cancer_cervical_0$antec_ets)
+```
+
+### ***La prevalencia más alta se detectó en Piura (16,85 %,)***
+
+Un estudio previo realizado en Perú reportó una prevalencia de mujeres que recibieron atención médica en la red de clínicas AUNA en Perú de 16,85 (DOI: <https://doi.org/10.1177/10732748251318386>).
+
+**Este conjunto de datos incluye información *relevante sobre:***
+
+1.  *Estado de infección por Virus del Papiloma Humano (VPH)*
+
+2.  *Antecedentes de Enfermedades de Transmisión Sexual (ETS)*
+
+En este caso, la prevalencia del estudio previo representa el valor esperado, mientras que la prevalencia observada en nuestro conjunto de datos representa el valor observado.
+
+Uno de los objetivos de nuestro análisis es evaluar si la proporción observada de antecedentes de ets difiere significativamente de la proporción esperada. Para ello, utilizamos la prueba de bondad de ajuste de Chi-cuadrado.
+
+Las hipótesis de esta prueba son las siguientes:
+
+-   **Hipótesis nula (H₀):** No existe una diferencia significativa entre la proporción observada y la esperada.
+
+-   **Hipótesis alternativa (H₁):** Existe una diferencia significativa entre la proporción observada y la esperada.
+
+En R, esta prueba se realiza mediante la función `chisq.test()`, a la cual se deben proporcionar los valores observados y las proporciones esperadas para llevar a cabo la comparación.
+
+```{r}
+chisq.test(x = c(15, 203), p = c(0.1685, 0.8315))
+```
+
+***INTERPRETACIÓN***
+
+P value=0.00008409
+
+Nivel de significancia= 0.05
+
+P value \< Nivel de significancia
+
+0.00008409 \< 0.05
+
+Se rechaza la hipotesis nula y se acepta la hipotesis alterna (No existe una diferencia significativa entre la proporción observada y la esperada.)
+
+### ***En Arequipa, la prevalencia fue la más baja (13,58 %)***
+
+Un estudio previo realizado en Perú reportó una prevalencia de mujeres que recibieron atención médica en la red de clínicas AUNA en Perú de 13,58 (DOI: <https://doi.org/10.1177/10732748251318386>).
+
+```{r}
+chisq.test(x = c(15, 203), p = c(0.1358, 0.8642))
+```
+
+***INTERPRETACIÓN***
+
+P value=0.003885
+
+Nivel de significancia= 0.05
+
+P value \< Nivel de significancia
+
+0.003885\< 0.05
+
+Se rechaza la hipotesis nula y se acepta la hipotesis alterna (existe una diferencia significativa entre la proporción observada y la esperada.)
+
+## para la variable antec_fam
+
+```{r}
+table(data_cancer_cervical_0$antec_fam)
+```
+
+Un estudio previo realizado en Perú reportó una prevalencia de antecedentes familiares del 9.23% (URL: <http://www.scielo.org.pe/scielo.php?pid=S1728-59172019000400003&script=sci_arttext&tlng=pt>)
+
+FRECUENCIA:
+
+1.  sí tienen antecedentes familiares = 43
+
+    no tienen antecedentes familiares = 175
+
+2.  chi cuadrado (prevalencia de antecedentes familiares)
+
+    prevalencia: 9.23% = 0.0923
+
+    1 - 0.0923 = 0.9077
+
+```{r}
+chisq.test(x = c(43, 175), p = c(0.0923, 0.9077))
+```
+
+**INTERPRETACIÓN**:
+
+P-value = 0.00000008632 \< el nival de significancia 0.05, por lo tanto se rechaza la hipotesis nula y se acepta la hipotesis alterna, esto quiere decir que en cuanto a la variable de antecedentes familiares existe una diferencia significativa entre la proporción observada y la esperada.
+
+## para la variable actitud
+
+```{r}
+table(data_cancer_cervical_0$actitud)
+```
+
+Un estudio previo realizado en Perú reportó una prevalencia de actitud del 60,7% (DOI:<https://doi.org/10.51288/00840405>)
+
+En este caso, la prevalencia del estudio previo representa el valor esperado, mientras que la prevalencia observada en nuestro conjunto de datos representa el valor observado.
+
+*Prevalencia*: 60,7% = 0.607
+
+1 - 0.607 = 0.393
+
+En R, esta prueba se realiza mediante la función `chisq.test()`, a la cual se deben proporcionar los valores observados y las proporciones esperadas para llevar a cabo la comparación.
+
+```{r}
+chisq.test(x = c(85, 133), p = c(0.607, 0.393))
+```
+
+***INTERPRETACIÓN***
+
+P value=0.00000000005285
+
+Nivel de significancia= 0.05
+
+P value \< Nivel de significancia
+
+0.00000000005285 \< 0.05
+
+Puesto que el valor de p es menor a 0.05, se rechaza la hipotesis nula y se acepta la hipotesis alterna (No existe una diferencia significativa entre la proporción observada y la esperada.)
+
+#### *EJEMPLO:*
+
+```{r}
+table(data_cancer_cervical_0$actitud)
+```
+
+#### **Referencia de estudio previo**
+
+Un estudio realizado en Perú reportó una **prevalencia de actitud positiva del 60,7%**\
+DOI: <https://doi.org/10.51288/00840405>
+
+Esto se traduce en:
+
+-   Proporción esperada positiva: 0.607
+
+-   Proporción esperada negativa: 1 - 0.607 = 0.393
+
+#### **Prueba de bondad de ajuste (Chi-cuadrado)**
+
+Se aplica la prueba chi-cuadrado para comparar las proporciones observadas en nuestro estudio con las esperadas según el estudio previo:
+
+#### **Resultado**
+
+Supongamos que el resultado de la prueba fue:
+
+```{r}
+chisq.test(x = c(85, 133), p = c(0.607, 0.393))
+```
+
+#### ***Interpretación***
+
+-   Valor p: 5.285e-11 (0.00000000005285)
+
+-   Nivel de significancia: 0.05
+
+-   Comparación: 0.00000000005285 \< 0.05
+
+**Conclusión:**\
+Dado que el valor de p es menor que 0.05, **se rechaza la hipótesis nula**. Esto indica que **existe una diferencia significativa entre la proporción de actitud observada en nuestro estudio y la proporción reportada en el estudio previo**.
